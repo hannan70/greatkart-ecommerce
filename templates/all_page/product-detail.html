@@ -11,18 +11,18 @@
 				<aside class="col-md-6">
 					<article class="gallery-wrap">
 						<div class="img-big-wrap">
-						   <a href="#"><img src="{{ product.product_image.url }}"></a>
+						   <a href="#"><img src="{{ single_product.product_image.url }}"></a>
 						</div> <!-- img-big-wrap.// -->
 
 					</article> <!-- gallery-wrap .end// -->
 				</aside>
 				<main class="col-md-6 border-left">
 					<article class="content-body">
-					<h2 class="title">{{ product.product_name }}</h2>
+					<h2 class="title">{{ single_product.product_name }}</h2>
 					<div class="mb-3">
-						<var class="price h4">${{ product.price }}</var>
+						<var class="price h4">${{ single_product.price }}</var>
 					</div>
-					<p>{{ product.product_desc }}</p>
+					<p>{{ single_product.product_desc }}</p>
 					<hr>
 						<div class="row">
 							<div class="item-option-select">
@@ -63,10 +63,15 @@
 							</div>
 						</div> <!-- row.// -->
 						<hr>
-						{% if product.stock <= 0 %}
+						{% if single_product.stock <= 0 %}
 							<h4 class="text-danger">Out Of Stock</h4>
 						{% else %}
-						<a href="{% url 'add-cart' product.id %}" class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+							{% if in_cart %}
+								<a href="#" class="btn  btn-success disabled"> <span class="text">Added to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+								<a href="{% url 'cart-page' %}" class="btn  btn-primary"> <span class="text">View</span> <i class="fas fa-shopping-cart"></i>  </a>
+							{% else %}
+								<a href="{% url 'add-cart' single_product.id %}" class="btn  btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
+							{% endif %}
 						{% endif %}
 					</article> <!-- product-info-aside .// -->
 				</main> <!-- col.// -->

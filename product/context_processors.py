@@ -18,6 +18,9 @@ def product_context_processor(request):
         products = Product.objects.all().filter(is_available=True).order_by('-created_date')
         total_product = products.count()
 
+    # count all cart items
+
+
     return {
         "products": products,
         'total_product': total_product
