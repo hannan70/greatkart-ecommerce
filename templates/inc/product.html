@@ -1,5 +1,6 @@
 {% load static %}
-{% for product in products %}
+{% if page_products %}
+{% for product in page_products %}
 <div class="{% if request.path == '/' %} col-md-3 {% else %} col-md-4 {% endif %}">
     <div class="card card-product-grid">
         <a href="{{ product.get_single_product_url }}" class="img-wrap"> <img src="{{ product.product_image.url }}"> </a>
@@ -11,6 +12,7 @@
                 <a href="{{ product.get_single_product_url }}" class="btn btn-block btn-primary mt-2">View Details</a>
              </div>
             {% else %}
+
             <div class="rating-star __web-inspector-hide-shortcut__">
                 <span>
                     <i class="fa fa-star" aria-hidden="true"></i>
@@ -25,3 +27,11 @@
     </div>
 </div>
 {% endfor %}
+
+{% else %}
+    <div class="text-center mt-3 d-block">
+        <div class="col-12 mx-auto">
+            <h2>No Result Found. Please Try Again</h2>
+        </div>
+    </div>
+{%  endif %}

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-
+from django.db.models import Q
 from cart.models import CartItem
 from cart.views import _cart_id, get_cart
 from product.models import Product
@@ -25,3 +25,16 @@ def product_details(request, category_slug, product_slug):
         'in_cart': in_cart
     }
     return render(request, "all_page/product-detail.html", context)
+
+
+def search(request):
+    if "keyword" in request.GET:
+        keyword = request.GET['keyword']
+        if keyword:
+            page_products = Product.objects.order_by('-created_date').filter(Q(product_name__icontains=keyword) | Q(product_desc__icontains=keyword))
+            total_product = page_products.count()
+    context = {
+        'page_products': page_products,
+        "total_product": total_product
+    }
+    return render(request, "all_page/store.html", context)
