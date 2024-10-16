@@ -33,7 +33,14 @@
                                         <div class="aside"><img src="{{ cart_item.product.product_image.url }}" class="img-sm"></div>
                                         <figcaption class="info">
                                             <a href="{{ cart_item.product.get_single_product_url }}" class="title text-dark">{{ cart_item.product.product_name }}</a>
-                                            <p class="text-muted small">Size: 256 GB <br> Brand: ADATA </p>
+                                            <p class="text-muted small">
+                                                {% if cart_item.variation.all %}
+                                                    {% for item in cart_item.variation.all %}
+                                                        {{ item.variation_category | capfirst }} : {{ item.variation_value | capfirst }}
+                                                <br>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </p>
                                         </figcaption>
                                     </figure>
                                 </td>
@@ -42,13 +49,19 @@
                                     <div class="col">
                                         <div class="input-group input-spinner">
                                             <div class="input-group-prepend">
-                                                <a href="{% url 'decrease_cart' cart_item.product.id %}" class="btn btn-light {% if cart_item.quantity <= 1 %} disabled {% endif %}" type="button" id="button-plus"><i
+                                                <a href="{% url 'decrease_cart' cart_item.product.id cart_item.id %}" class="btn btn-light {% if cart_item.quantity <= 1 %} disabled {% endif %}" type="button" id="button-plus"><i
                                                         class="fa fa-minus"></i></a>
                                             </div>
                                             <input type="text" class="form-control" {% if cart_item.quantity <= 1 %} readonly {% endif %}  value="{{ cart_item.quantity }}">
                                             <div class="input-group-append">
-                                                <a href="{% url 'add-cart' cart_item.product.id %}" class="btn btn-light" type="button" id="button-minus"><i
-                                                        class="fa fa-plus"></i></a>
+                                                <form action="{% url 'add-cart' cart_item.product.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    {% for i in cart_item.variation.all %}
+                                                    <input type="hidden" name="{{ i.variation_category | lower }}" value="{{ i.variation_value }}">
+                                                    {% endfor %}
+                                                    <button type="submit" class="btn btn-light" type="button" id="button-minus"><i
+                                                        class="fa fa-plus"></i></button>
+                                                </form>
                                             </div>
                                         </div> <!-- input-group.// -->
                                     </div> <!-- col.// -->
@@ -60,7 +73,7 @@
                                     </div> <!-- price-wrap .// -->
                                 </td>
                                 <td class="text-right">
-                                    <a href="{% url 'remove_cart' cart_item.product.id %}" class="btn btn-danger"> Remove</a>
+                                    <a href="{% url 'remove_cart' cart_item.product.id cart_item.id %}" onclick="return confirm('Are you sure delete this item') " class="btn btn-danger"> Remove</a>
                                 </td>
                             </tr>
                         {% endfor %}

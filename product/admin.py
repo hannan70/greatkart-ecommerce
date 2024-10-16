@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from product.models import Product
+from product.models import Product, Variation
+
 
 # Register your models here.
 class ProductAdmin(admin.ModelAdmin):
@@ -12,4 +13,10 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {"product_slug": ("product_name", )}
 
 
+class VariationAdmin(admin.ModelAdmin):
+    list_display = ("product", "variation_category", "variation_value", "created_at", "is_active",)
+    list_editable = ("is_active",)
+
+
 admin.site.register(Product, ProductAdmin)
+admin.site.register(Variation, VariationAdmin)
