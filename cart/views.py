@@ -1,9 +1,5 @@
-from itertools import product
-
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.fields import return_None
-from django.http import HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from cart.models import CartItem, Cart
 from product.models import Product, Variation
 from django.contrib import messages
@@ -82,7 +78,6 @@ def add_cart(request, product_id):
             if len(product_variation) > 0:
                 item.variation.clear()
                 for i in product_variation:
-                    print(i)
                     item.variation.add(i)
 
             item.save()
@@ -93,7 +88,6 @@ def add_cart(request, product_id):
         if len(product_variation) > 0:
             item.variation.clear()
             for i in product_variation:
-                print(i)
                 item.variation.add(i)
         item.save()
     return redirect('cart-page')
