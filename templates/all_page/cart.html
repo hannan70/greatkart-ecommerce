@@ -93,9 +93,16 @@
                             <dd class="text-right"> ${{ tax }}</dd>
                         </dl>
                         <dl class="dlist-align">
-                            <dt>Total:</dt>
-                            <dd class="text-right text-dark b"><strong>${{ grand_total }}</strong></dd>
+                            <dt>Grand Total:</dt>
+                            <dd class="text-right text-dark b"><strong id="grand_total_val">${{ grand_total }} </strong></dd>
                         </dl>
+                        <hr>
+                        <form action="" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" id="grand_total" value="{{ grand_total }}">
+                            <input type="text" class="form-control mb-2" id="voucher_name"  name="voucher_name" placeholder="Enter Voucher Code">
+                            <button id="voucherForm" type="submit" class="btn btn-primary  btn-block">Apply</button>
+                        </form>
                         <hr>
                         <p class="text-center mb-3">
                             <img src="{% static './images/misc/payments.png' %}" height="26">
@@ -110,5 +117,41 @@
         <!-- ============================ COMPONENT 1 END .// ================================= -->
     </div> <!-- container .//  -->
 </section>
+
+
+<script type="text/javascript">
+
+    $(document).ready(function(){
+        $("#voucherForm").click(function(e){
+            e.preventDefault()
+              let voucher_name = $("#voucher_name").val()
+              let csrf = $("input[name=csrfmiddlewaretoken]").val()
+              let grand_total = $("#grand_total").val()
+
+              mydata = {
+                    voucher_name: voucher_name,
+                    grand_total: grand_total,
+                    csrfmiddlewaretoken: csrf
+              }
+              $.ajax({
+                  url: "{% url 'voucher' %}",
+                  method: "POST",
+                  dataType: 'json',
+                  data: mydata,
+                  success: function (data) {
+                       $("#grand_total_val").text("$"+data.grand_total);
+                       toastr.success(data.success)
+                  },
+                  error: function (data) {
+                      console.log('Error:', data);
+                  }
+             });
+        })
+    })
+
+</script>
+
+
 {% endblock %}
+
 

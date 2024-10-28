@@ -7,7 +7,6 @@ class Cart(models.Model):
     cart_id = models.CharField(max_length=100, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
 
-
     def __str__(self):
         return self.cart_id
 
@@ -25,6 +24,16 @@ class CartItem(models.Model):
 
     def sub_total(self):
         return self.product.price * self.quantity
+
+
+class Voucher(models.Model):
+    voucher_name = models.CharField(max_length=100)
+    voucher_discount = models.IntegerField()
+    voucher_validity = models.DateField()
+    voucher_status = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.voucher_name
 
 
 
