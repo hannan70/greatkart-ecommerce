@@ -33,7 +33,6 @@ add new cart
 """
 def add_cart(request, product_id):
     if request.user.is_authenticated and request.user.is_active:
-
         product = get_product(product_id)
         product_variation = []
         # add variation
@@ -48,7 +47,6 @@ def add_cart(request, product_id):
                 except:
                     pass
 
-        print(product_variation)
         # add cart session id
         try:
             cart = get_cart(request)
@@ -58,11 +56,11 @@ def add_cart(request, product_id):
             )
         cart.save()
 
-        exists_cart = CartItem.objects.filter(product=product, cart=cart).exists()
+        exists_cart = CartItem.objects.filter(product=product, cart=cart, user=request.user).exists()
 
         if exists_cart:
             # existing cart increase
-            cart_item = CartItem.objects.filter(product=product, cart=cart)
+            cart_item = CartItem.objects.filter(product=product, cart=cart, user=request.user)
             existing_variation_list = []
             id = []
             for item in cart_item:
@@ -77,7 +75,7 @@ def add_cart(request, product_id):
                 item.quantity += 1
                 item.save()
             else:
-                item = CartItem.objects.create(product=product, cart=cart, quantity=1)
+                item = CartItem.objects.create(product=product, cart=cart, user=request.user, quantity=1)
                 if len(product_variation) > 0:
                     item.variation.clear()
                     for i in product_variation:
@@ -87,7 +85,7 @@ def add_cart(request, product_id):
 
         else:
             # add new fresh cart
-            item = CartItem.objects.create(product=product, cart=cart, quantity=1)
+            item = CartItem.objects.create(product=product, cart=cart, user=request.user, quantity=1)
             if len(product_variation) > 0:
                 item.variation.clear()
                 for i in product_variation:
@@ -105,8 +103,9 @@ Decrease the cart quantity
 def decrease_cart(request, product_id, cart_item_id):
     cart = get_cart(request)
     product = get_product(product_id)
+
     try:
-        cart_items = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)
+        cart_items = CartItem.objects.get(product=product, cart=cart, id=cart_item_id, user=request.user)
         if cart_items.quantity > 1:
             cart_items.quantity -= 1
             cart_items.save()
@@ -122,7 +121,7 @@ def remove_cart(request, product_id, cart_item_id):
     cart = get_cart(request)
     product = get_product(product_id)
     try:
-        cart_items = CartItem.objects.get(product=product, cart=cart, id=cart_item_id)
+        cart_items = CartItem.objects.get(product=product, cart=cart, id=cart_item_id, user=request.user)
         if cart_items:
             cart_items.delete()
         messages.success(request, "Cart Remove Success")
@@ -135,17 +134,17 @@ View cart page
 """
 @login_required(login_url='login')
 def cart_page(request, grand_total=0, tax=0, total=0, quantity=0, cart_items=None):
-    try:
-        cart = get_cart(request)
-        cart_items = CartItem.objects.filter(cart=cart, is_active=True)
-        # total and subtotal for
-        for cart_item in cart_items:
-            total += (cart_item.product.price * cart_item.quantity)
-        # tax calculate
-        tax = (2*total)/100
-        grand_total = total + tax
-    except ObjectDoesNotExist:
-        pass
+
+    # get all active cart
+    cart_items = CartItem.objects.filter(user=request.user, is_active=True)
+
+    # total and subtotal for
+    for cart_item in cart_items:
+        total += (cart_item.product.price * cart_item.quantity)
+    # tax calculate
+    tax = (2*total)/100
+    grand_total = total + tax
+
     context = {
         'cart_items': cart_items,
         'total': total,

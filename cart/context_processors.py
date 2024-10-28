@@ -1,5 +1,6 @@
+
 from cart.models import CartItem, Cart
-from cart.views import get_cart
+from cart.views import _cart_id
 
 
 def cart_content_processor(request):
@@ -7,11 +8,19 @@ def cart_content_processor(request):
     if "admin" in request.path:
         return  {}
     else:
+
         try:
-            cart = get_cart(request)
-            cart_items = CartItem.objects.all().filter(cart=cart)
+            # get cart id
+            cart = Cart.objects.filter(cart_id=_cart_id(request))
+            if request.user.is_authenticated:
+                cart_items = CartItem.objects.all().filter(user=request.user)
+            else:
+                cart_items = CartItem.objects.all().filter(cart=cart[:1])
+
+            # count total cart
             for cart_item in cart_items:
                 cart_count += cart_item.quantity
+
         except Cart.DoesNotExist:
             cart_count = 0
 

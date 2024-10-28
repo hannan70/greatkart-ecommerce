@@ -1,4 +1,7 @@
+
 from django.db import models
+
+from accounts.models import Account
 from product.models import Product, Variation
 
 
@@ -12,11 +15,13 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     variation = models.ManyToManyField(Variation, blank=True)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     is_active = models.BooleanField(default=True)
+
 
     def __str__(self):
         return self.product.product_name

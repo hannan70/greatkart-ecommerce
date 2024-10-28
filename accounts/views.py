@@ -11,6 +11,8 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from accounts.forms import AccountForm
 from accounts.models import Account
+from cart.models import Cart
+from cart.views import get_cart, _cart_id
 
 
 # Create your views here.
